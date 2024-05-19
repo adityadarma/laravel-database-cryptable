@@ -1,11 +1,14 @@
 <?php
 
-namespace AdityaDarma\LaravelDatabaseCryptable;
+namespace AdityaDarma\LaravelDatabaseCryptable\Adapters;
 
+use AdityaDarma\LaravelDatabaseCryptable\Contracts\Cryptable;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class Crypter
+class CrypterMySql implements Cryptable
 {
     protected string $key;
     protected string $cipher;
@@ -79,5 +82,26 @@ class Crypter
         } catch(Exception $e){
             return false;
         }
+    }
+
+    /**
+     * Validate unique data encryption
+     *
+     * @param mixed $data
+     * @param string $table
+     * @param string $field
+     * @param mixed $value
+     * @return bool
+     */
+    public function uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value = null): bool
+    {
+        $data = DB::table($table)
+                ->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$field}`), '{$this->key}') USING utf8mb4) = '{$data}' ")
+                ->when(isset($value), function(Builder $query) use ($value) {
+                    $query->where('id','!=', $value);
+                })
+                ->first();
+
+        return $data ? false : true;
     }
 }

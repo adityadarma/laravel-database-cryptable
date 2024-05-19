@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string encrypt(mixed $value)
  * @method static mixed decrypt(string $value)
  * @method static bool isEncrypted(mixed $value)
+ * @method static bool uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value = null)
  *
  * @see \AdityaDarma\LaravelDatabaseCryptable\Crypter
  */

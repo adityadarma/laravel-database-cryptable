@@ -45,10 +45,7 @@ trait CrypterAttribute
      */
     public function isSupportDriver(): bool
     {
-        return in_array($this->getDatabaseDriver(), [
-            'mysql',
-            'mariadb'
-        ]);
+        return in_array($this->getDatabaseDriver(), config('cryptable.driver'));
     }
 
     /**

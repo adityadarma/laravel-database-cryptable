@@ -2,17 +2,20 @@
 
 namespace AdityaDarma\LaravelDatabaseCryptable;
 
+use AdityaDarma\LaravelDatabaseCryptable\Adapters\CrypterMariaDB;
+use AdityaDarma\LaravelDatabaseCryptable\Adapters\CrypterMySql;
+use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DatabaseCryptableInstall;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DecryptAttribute;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\EncryptAttribute;
-use AdityaDarma\LaravelDatabaseCryptable\Crypter;
 use AdityaDarma\LaravelDatabaseCryptable\Facades\Crypt;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
 
 class LaravelDatabaseCryptableServiceProvider extends ServiceProvider
 {
+    public const CONFIG_PATH = __DIR__ . '/../config/cryptable.php';
+
     /**
      * Register services.
      *
@@ -21,9 +24,17 @@ class LaravelDatabaseCryptableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('cryptable', function($app) {
-            $config = $app->make('config')->get('app');
+            $config = $app->make('config')->get('cryptable');
 
-            return new Crypter($config['key']);
+            switch ($config['default']){
+                case 'mysql':
+                    return new CrypterMySql($config['key']);
+                case 'mariadb':
+                    return new CrypterMariaDB($config['key']);
+                default:
+                    throw new RuntimeException("Unknown driver encryption");
+           }
+
         });
     }
 
@@ -34,23 +45,20 @@ class LaravelDatabaseCryptableServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->publishes([
+            self::CONFIG_PATH => config_path('cryptable.php')
+        ], 'config');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
+                DatabaseCryptableInstall::class,
                 EncryptAttribute::class,
-                DecryptAttribute::class
+                DecryptAttribute::class,
             ]);
         }
 
         Validator::extend('unique_encrypted', function ($attribute, $value, $parameters, $validator) {
-            $key = Crypt::getKey();
-            $data = DB::table($parameters[0])
-                ->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$parameters[1]}`), '{$key}') USING utf8mb4) = '{$value}' ")
-                ->when(isset($parameters[2]), function(Builder $query) use ($parameters) {
-                    $query->where('id','!=',$parameters[2]);
-                })
-                ->first();
-
-            return $data ? false : true;
+            return Crypt::uniqueEncryptableValidation($value, $parameters[0], $parameters[1], $parameters[2] ?? null);
         });
     }
 }
