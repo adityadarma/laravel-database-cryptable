@@ -2,18 +2,20 @@
 
 namespace AdityaDarma\LaravelDatabaseCryptable\Builders;
 
+use AdityaDarma\LaravelDatabaseCryptable\Contracts\OrderInterface;
+use AdityaDarma\LaravelDatabaseCryptable\Contracts\WhereInterface;
 use AdityaDarma\LaravelDatabaseCryptable\Facades\Crypt;
 use Illuminate\Database\Eloquent\Builder;
 
-class CryptableEloquentBuilder extends Builder
+class CryptableEloquentBuilderMySql extends Builder implements WhereInterface, OrderInterface
 {
     /**
-     * @param $param1
-     * @param $param2
-     * @param $param3
+     * @param string $param1
+     * @param mixed $param2
+     * @param mixed $param3
      * @return Builder
      */
-    public function whereEncrypted($param1, $param2, $param3 = null)
+    public function whereEncrypted(string $param1, mixed $param2, mixed $param3 = null): Builder
     {
         $field     = $param1;
         $operation = isset($param3) ? $param2 : '=';
@@ -25,12 +27,12 @@ class CryptableEloquentBuilder extends Builder
     }
 
     /**
-     * @param $param1
-     * @param $param2
-     * @param $param3
+     * @param string $param1
+     * @param mixed $param2
+     * @param mixed $param3
      * @return Builder
      */
-    public function orWhereEncrypted($param1, $param2, $param3 = null)
+    public function orWhereEncrypted(string $param1, mixed $param2, mixed $param3 = null): Builder
     {
         $field     = $param1;
         $operation = isset($param3) ? $param2 : '=';
@@ -42,11 +44,12 @@ class CryptableEloquentBuilder extends Builder
     }
 
     /**
-     * @param $field
-     * @param $direction
+     * @param string $field
+     * @param string $direction
      * @return Builder
      */
-    public function orderByEncrypted($field, $direction = 'asc') {
+    public function orderByEncrypted(string $field, string $direction = 'asc'): Builder
+    {
         $key = Crypt::getKey();
 
         return self::orderByRaw("CONVERT(AES_DECRYPT(FROM_bASE64(`{$field}`), '{$key}') USING utf8mb4) {$direction}");

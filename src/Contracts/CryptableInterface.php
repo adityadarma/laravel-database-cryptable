@@ -2,7 +2,7 @@
 
 namespace AdityaDarma\LaravelDatabaseCryptable\Contracts;
 
-interface Cryptable
+interface CryptableInterface
 {
     public function getKey(): string;
 
@@ -12,5 +12,5 @@ interface Cryptable
 
     public function isEncrypted(mixed $value): bool;
 
-    public function uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value = null): bool;
+    public function uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value): bool;
 }

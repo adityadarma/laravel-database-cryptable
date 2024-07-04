@@ -11,6 +11,7 @@ From your projects root folder in terminal run:
 ### Support
 - MYSQL
 - MariaDB
+- PostgreSQL (required extension pgcrypto)
 
 ### Usage
 
@@ -90,10 +91,11 @@ $user = User::whereEncrypted('email','test@gmail.com')->filter(function ($item) 
 
 ## Credits
 This package was inspired from the following:
- [austinheap/laravel-database-encryption](https://github.com/austinheap/laravel-database-encryption)
- [magros/laravel-model-encryption](https://github.com/magros/laravel-model-encryption)
- [DustApplication/laravel-database-model-encryption](https://github.com/DustApplication/laravel-database-model-encryption.git)
- [elgiborsolution/laravel-database-encryption](https://github.com/elgiborsolution/laravel-database-encryption)
+ - [austinheap/laravel-database-encryption](https://github.com/austinheap/laravel-database-encryption)
+ - [magros/laravel-model-encryption](https://github.com/magros/laravel-model-encryption)
+ - [DustApplication/laravel-database-model-encryption](https://github.com/DustApplication/laravel-database-model-encryption.git)
+ - [elgiborsolution/laravel-database-encryption](https://github.com/elgiborsolution/laravel-database-encryption)
+ - [NdukZ/laravel-database-encryption-pgsql](https://github.com/NdukZ/laravel-database-encryption-pgsql)
 
 ## License
 

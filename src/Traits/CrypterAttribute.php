@@ -2,10 +2,13 @@
 
 namespace AdityaDarma\LaravelDatabaseCryptable\Traits;
 
-use AdityaDarma\LaravelDatabaseCryptable\Builders\CryptableEloquentBuilder;
+use AdityaDarma\LaravelDatabaseCryptable\Builders\CryptableEloquentBuilderMariaDB;
+use AdityaDarma\LaravelDatabaseCryptable\Builders\CryptableEloquentBuilderMySql;
+use AdityaDarma\LaravelDatabaseCryptable\Builders\CryptableEloquentBuilderPostgreSQL;
 use AdityaDarma\LaravelDatabaseCryptable\Exception\UnsupportedDriverException;
 use AdityaDarma\LaravelDatabaseCryptable\Facades\Crypt;
 use Exception;
+use RuntimeException;
 
 trait CrypterAttribute
 {
@@ -17,7 +20,16 @@ trait CrypterAttribute
      */
     public function newEloquentBuilder($query)
     {
-        return new CryptableEloquentBuilder($query);
+        switch ($this->getDatabaseDriver()){
+            case 'mysql':
+                return new CryptableEloquentBuilderMySql($query);
+            case 'mariadb':
+                return new CryptableEloquentBuilderMariaDB($query);
+            case 'pgsql':
+                return new CryptableEloquentBuilderPostgreSQL($query);
+            default:
+                throw new RuntimeException("Unknown driver encryption");
+       }
     }
 
     /**
@@ -86,7 +98,9 @@ trait CrypterAttribute
 
             try {
                 $value = Crypt::decrypt($value);
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                echo $e. PHP_EOL;
+            }
         }
         return $value;
     }

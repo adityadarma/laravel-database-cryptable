@@ -2,26 +2,26 @@
 
 namespace AdityaDarma\LaravelDatabaseCryptable\Adapters;
 
-use AdityaDarma\LaravelDatabaseCryptable\Contracts\Cryptable;
+use AdityaDarma\LaravelDatabaseCryptable\Contracts\CryptableInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class CrypterMySql implements Cryptable
+class CrypterMySql implements CryptableInterface
 {
     protected string $key;
     protected string $cipher;
     protected string $iv;
 
-    public function __construct($key, $cipher = 'aes-128-ecb')
+    public function __construct($key)
     {
         if (Str::startsWith($key, $prefix = 'base64:')) {
             $key = base64_decode(Str::after($key, $prefix));
         }
 
-        $this->key = substr(hash('sha256', $key), 0, openssl_cipher_iv_length(strtolower($cipher)));
-        $this->cipher = $cipher;
+        $this->cipher = 'aes-128-ecb';
+        $this->key = substr(hash('sha256', $key), 0, openssl_cipher_iv_length(strtolower($this->cipher)));
         $this->iv = "";
     }
 
@@ -93,7 +93,7 @@ class CrypterMySql implements Cryptable
      * @param mixed $value
      * @return bool
      */
-    public function uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value = null): bool
+    public function uniqueEncryptableValidation(mixed $data, string $table, string $field, mixed $value): bool
     {
         $data = DB::table($table)
                 ->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$field}`), '{$this->key}') USING utf8mb4) = '{$data}' ")

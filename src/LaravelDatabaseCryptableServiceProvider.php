@@ -4,10 +4,12 @@ namespace AdityaDarma\LaravelDatabaseCryptable;
 
 use AdityaDarma\LaravelDatabaseCryptable\Adapters\CrypterMariaDB;
 use AdityaDarma\LaravelDatabaseCryptable\Adapters\CrypterMySql;
+use AdityaDarma\LaravelDatabaseCryptable\Adapters\CrypterPostgreSQL;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DatabaseCryptableInstall;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DecryptAttribute;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\EncryptAttribute;
 use AdityaDarma\LaravelDatabaseCryptable\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;
@@ -31,10 +33,11 @@ class LaravelDatabaseCryptableServiceProvider extends ServiceProvider
                     return new CrypterMySql($config['key']);
                 case 'mariadb':
                     return new CrypterMariaDB($config['key']);
+                case 'pgsql':
+                    return new CrypterPostgreSQL($config['key']);
                 default:
                     throw new RuntimeException("Unknown driver encryption");
            }
-
         });
     }
 
