@@ -75,7 +75,7 @@ class Crypter
     public function isEncrypted(mixed $value): bool
     {
         try {
-            return $this->decrypt($value) !== false ? true : false;
+            return $this->decrypt(strval($value)) !== false ? true : false;
         } catch(Exception $e){
             return false;
         }
