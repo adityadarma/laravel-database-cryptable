@@ -9,7 +9,6 @@ use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DatabaseCryptableInsta
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\DecryptAttribute;
 use AdityaDarma\LaravelDatabaseCryptable\Console\Commands\EncryptAttribute;
 use AdityaDarma\LaravelDatabaseCryptable\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;

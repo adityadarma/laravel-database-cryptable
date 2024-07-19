@@ -3,7 +3,6 @@
 namespace AdityaDarma\LaravelDatabaseCryptable\Adapters;
 
 use AdityaDarma\LaravelDatabaseCryptable\Contracts\CryptableInterface;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -77,11 +76,7 @@ class CrypterMySql implements CryptableInterface
      */
     public function isEncrypted(mixed $value): bool
     {
-        try {
-            return $this->decrypt($value) !== false ? true : false;
-        } catch(Exception $e){
-            return false;
-        }
+        return $this->decrypt(strval($value)) !== false ? true : false;
     }
 
     /**

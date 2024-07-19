@@ -39,7 +39,7 @@ class CrypterPostgreSQL implements CryptableInterface
      */
     public function encrypt(mixed $value): string
     {
-        return DB::connection()->select(
+        return DB::connection('pgsql')->select(
             "select encode(pgp_sym_encrypt(?, ?)::bytea, 'base64') AS text",
             [$value, $this->key]
         )[0]->text;
@@ -53,10 +53,15 @@ class CrypterPostgreSQL implements CryptableInterface
      */
     public function decrypt(string $value): mixed
     {
-        return DB::connection()->select(
-            "select convert_from(pgp_sym_decrypt(decode(?,'base64')::bytea , ?)::bytea, 'UTF-8') AS text",
-            [$value, $this->key]
-        )[0]->text;
+        try {
+            $result = DB::connection('pgsql')->selectOne(
+                "select convert_from(pgp_sym_decrypt(decode(?,'base64')::bytea , ?)::bytea, 'UTF-8') AS text",
+                [$value, $this->key]
+            );
+            return $result->text;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -67,11 +72,7 @@ class CrypterPostgreSQL implements CryptableInterface
      */
     public function isEncrypted(mixed $value): bool
     {
-        try {
-            return $this->decrypt($value) !== false ? true : false;
-        } catch(Exception $e){
-            return false;
-        }
+        return (bool) $this->decrypt(strval($value)) !== false;
     }
 
     /**

@@ -30,7 +30,6 @@ class EncryptAttribute extends Command
     {
         $modelName = $this->argument('model');
 
-        DB::beginTransaction();
         try {
             $model = $this->getModelClass($modelName);
             $datas = $model::get();
@@ -52,10 +51,8 @@ class EncryptAttribute extends Command
             }
 
             $this->comment('Encrypt data successfully');
-            DB::commit();
         } catch(Exception $e) {
             $this->comment('Failed to Encrypt data');
-            DB::rollBack();
         }
     }
 
